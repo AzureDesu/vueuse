@@ -6,6 +6,7 @@ import { vOnClickOutside } from './directive'
 
 const modal = ref(false)
 const modalRef = ref(null)
+const dropdownRef = ref(null)
 
 onClickOutside(
   modalRef,
@@ -14,12 +15,20 @@ onClickOutside(
     modal.value = false
   },
 )
+// By implementing the class, we ensure that when we use the Toggle Dropdown feature, the dropdown won't reopen unnecessarily, as it lies outside the scope of the dropdown reference.
+onClickOutside(
+  dropdownRef,
+  (event) => {
+    console.log(event)
+    if (dropdown.value && !event.target.closest('.dropdownBt')) {
+        dropdown.value = false;
+
+    }
+  },
+)
 
 const dropdown = ref(false)
-const dropdownHandler: OnClickOutsideHandler = (event) => {
-  console.log(event)
-  dropdown.value = false
-}
+
 </script>
 
 <template>
@@ -27,12 +36,12 @@ const dropdownHandler: OnClickOutsideHandler = (event) => {
     Open Modal
   </button>
   <div class="ml-2 relative inline-block">
-    <button @click.stop="dropdown = !dropdown">
+    <button class="dropdownBt" @click.stop="dropdown = !dropdown">
       Toggle Dropdown
     </button>
     <div
       v-if="dropdown"
-      v-on-click-outside.bubble="dropdownHandler"
+      ref="dropdownRef"
       class="dropdown-inner"
     >
       Click outside of the dropdown to close it.
